@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "react-native-series",
-    "slug": "react-native-series",
+    "name": "Coffee App",
+    "slug": "coffee-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "reactnativeseries",
+    "icon": "./assets/images/coffee-icon.png",
+    "scheme": "coffeeapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -30,9 +30,9 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/coffee-splash.png",
           "imageWidth": 200,
-          "resizeMode": "contain",
+          "resizeMode": "cover",
           "backgroundColor": "#ffffff",
           "dark": {
             "backgroundColor": "#000000"
