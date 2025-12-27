@@ -1,112 +1,165 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Fonts } from '@/constants/theme';
-
-export default function TabTwoScreen() {
+import SkeletonComponent from "@/components/skeleton-explore";
+import { ThemedText } from "@/components/themed-text";
+import { subscribeCoffeeApi } from "@/hooks/coffeeApi";
+import { useColorScheme } from "@/hooks/use-color-scheme.web";
+import useCoffeeJson from "@/hooks/useCoffeeJson";
+import { Skeleton } from "moti/skeleton";
+import React, { useEffect } from "react";
+import { Image, ScrollView, StyleSheet, View } from "react-native";
+const CustomCard = ({
+  title,
+  img,
+  desc,
+}: {
+  title: string;
+  img: string;
+  desc: string;
+}) => {
+  const colorScheme = useColorScheme();
+  function isString(value: any): value is string {
+    return typeof value === "string";
+  }
+  console.log("Image source:", img);
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <IconSymbol
-          size={310}
-          color="#808080"
-          name="chevron.left.forwardslash.chevron.right"
-          style={styles.headerImage}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
+    <View
+      style={[
+        styles.card,
+        colorScheme === "dark"
+          ? {
+              // iOS Shadow
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              // Android Shadow
+              elevation: 5,
+            }
+          : {},
+      ]}
+    >
+      <Image
+        //@ts-ignore
+        source={
+          isString(img) ?? img.includes("http")
+            ? {
+                uri: img,
+              }
+            : img
+        }
+        style={styles.cardImage}
+      />
+      <View style={styles.cardContent}>
         <ThemedText
-          type="title"
+          style={styles.cardTitle}
+          coffeeColor={colorScheme === "dark" ? "#9f9797ff" : "black"}
+        >
+          {title}
+        </ThemedText>
+        <ThemedText
+          coffeeColor={colorScheme === "dark" ? "#9f9797ff" : "black"}
+        >
+          {desc}
+        </ThemedText>
+      </View>
+    </View>
+  );
+};
+
+export default function Explore() {
+  const [subscribed, setSubscribed] = React.useState(false);
+  const { loading, coffees, reload } = useCoffeeJson();
+  useEffect(() => {
+    const unsubscribe = subscribeCoffeeApi((value) => {
+      setSubscribed(value);
+      try {
+        if (typeof reload === "function") reload();
+      } catch (e) {
+        // ignore reload errors
+      }
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+  if (loading) {
+    return (
+      <View>
+        <View
           style={{
-            fontFamily: Fonts.rounded,
-          }}>
-          Explore
-        </ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title="File-based routing">
-        <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type="defaultSemiBold">app/(tabs)/_layout.tsx</ThemedText>{' '}
-          sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/router/introduction">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Android, iOS, and web support">
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press{' '}
-          <ThemedText type="defaultSemiBold">w</ThemedText> in the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title="Images">
-        <ThemedText>
-          For static images, you can use the <ThemedText type="defaultSemiBold">@2x</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">@3x</ThemedText> suffixes to provide files for
-          different screen densities
-        </ThemedText>
-        <Image
-          source={require('@/assets/images/react-logo.png')}
-          style={{ width: 100, height: 100, alignSelf: 'center' }}
-        />
-        <ExternalLink href="https://reactnative.dev/docs/images">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Light and dark mode components">
-        <ThemedText>
-          This template has light and dark mode support. The{' '}
-          <ThemedText type="defaultSemiBold">useColorScheme()</ThemedText> hook lets you inspect
-          what the user&apos;s current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href="https://docs.expo.dev/develop/user-interface/color-themes/">
-          <ThemedText type="link">Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title="Animations">
-        <ThemedText>
-          This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
-          the powerful{' '}
-          <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
-            react-native-reanimated
-          </ThemedText>{' '}
-          library to create a waving hand animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
-              component provides a parallax effect for the header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+            flex: 1,
+            paddingTop: 45,
+            paddingLeft: 15,
+          }}
+        >
+          <Skeleton width={230} height={20} />
+        </View>
+        <View style={[styles.grid]}>
+          <SkeletonComponent />
+          <SkeletonComponent />
+        </View>
+        <View style={styles.grid}>
+          <SkeletonComponent />
+          <SkeletonComponent />
+        </View>
+      </View>
+    );
+  }
+  return (
+    <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <ThemedText style={styles.headerText}>Explore Some Coffees:</ThemedText>
+        <View style={styles.grid}>
+          {coffees?.map((coffee, index) => (
+            <CustomCard
+              key={index}
+              title={coffee.name}
+              img={coffee.imageUri}
+              desc={coffee.description}
+            />
+          ))}
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    paddingHorizontal: 15,
+    paddingTop: 20,
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  headerText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  card: {
+    backgroundColor: "#00000010",
+    borderColor: "#4f4b4bff",
+    borderWidth: 2,
+    borderRadius: 10,
+    width: "48%", // two cards per row
+    marginBottom: 15,
+  },
+  cardImage: {
+    height: 150,
+    width: "100%",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+  },
+  cardContent: {
+    padding: 15,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
   },
 });
