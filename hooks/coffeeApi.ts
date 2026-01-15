@@ -21,6 +21,7 @@ function fullImageUrl(imagePath: string) {
 
 async function fetchJson<T>(url: string, opts?: RequestInit): Promise<T> {
   const res = await fetch(url, opts);
+
   if (!res.ok) {
     const body = await res.json().catch(() => null);
     const httpErr = {
@@ -48,7 +49,8 @@ export async function getCoffees(): Promise<RemoteCoffee[]> {
 // Note: removed hard-coded fallback. Callers should handle fetch failures and fall back to local assets when needed.
 
 export async function getCoffeeById(id: number): Promise<RemoteCoffee> {
-  return fetchJson<RemoteCoffee>(`${BASE}/coffee/${id}`);
+  const json = await fetchJson<RemoteCoffee>(`${BASE}/coffee/${id}`);
+  return json;
 }
 
 export async function getCoffeeByName(name: string): Promise<RemoteCoffee> {

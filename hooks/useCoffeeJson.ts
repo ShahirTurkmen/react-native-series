@@ -2,6 +2,7 @@ import { getCoffees } from "@/hooks/coffeeApi";
 import { useEffect, useState } from "react";
 
 export type CoffeeItem = {
+  id: number;
   name: string;
   description: string;
   imageUri: string;
@@ -14,6 +15,7 @@ export type CoffeeMapped = { name: string; desc: string; img: string };
 async function fetchRemoteCoffees(): Promise<CoffeeItem[]> {
   const data = await getCoffees();
   return data.map((c) => ({
+    id: c.id,
     name: c.name,
     description: c.description,
 
